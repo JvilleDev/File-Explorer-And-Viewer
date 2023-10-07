@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ver Markdown</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.2/markdown-it.min.js" integrity="sha512-ohlWmsCxOu0bph1om5eDL0jm/83eH09fvqLDhiEdiqfDeJbEvz4FSbeY0gLJSVJwQAp0laRhTXbUQG+ZUuifUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body>
+    <div id="markdown-content"></div>
+    <script>
+// Obtener el valor del parámetro "name" de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const filename = urlParams.get('name');
+const folderName = urlParams.get('folder'); // Obtener el valor del parámetro "folder"
+
+// Crear un objeto markdown-it
+const md = window.markdownit();
+
+if (filename) {
+    // Construir la ruta del archivo Markdown basada en la presencia del parámetro "folder"
+    let markdownUrl;
+    if (folderName) {
+        markdownUrl = `/${folderName}/${filename}`;
+    } else {
+        markdownUrl = `/${filename}`;
+    }
+
+    // Obtener el contenido del archivo Markdown y renderizarlo
+    fetch(markdownUrl)
+        .then(response => response.text())
+        .then(markdown => {
+            const htmlContent = md.render(markdown);
+            document.getElementById('markdown-content').innerHTML = htmlContent;
+        })
+        .catch(error => {
+            console.error('Error al obtener y renderizar el archivo Markdown:', error);
+        });
+}
+    </script>
+</body>
+</html>

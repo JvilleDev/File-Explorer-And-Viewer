@@ -1,0 +1,305 @@
+        :root {
+            --primarycolor: #84a98c;
+            --secondarycolor: #354f52;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #2f3e46;
+        }
+
+        #markdown-preview,
+        textarea {
+            font-family: inherit;
+            width: 90%;
+            height: 70vh;
+            max-height: 70vh;
+            overflow-y: auto;
+            resize: none;
+            font-size: 1rem;
+            border-radius: 1rem;
+            padding: 1rem;
+            outline: 1px solid var(--primarycolor);
+            box-shadow: 0px 0 0px 0px var(--primarycolor);
+            transition: box-shadow 0.2s ease-in-out, outline 0.2s ease-in-out;
+
+        }
+
+        blockquote {
+            background: #f9f9f9;
+            border-left: 10px solid #ccc;
+            margin: 1.5em 10px;
+            padding: 0.5em 10px;
+            quotes: "\201C" "\201D" "\2018" "\2019";
+        }
+
+        blockquote:before {
+            color: #ccc;
+            content: open-quote;
+            font-size: 4em;
+            line-height: 0.1em;
+            margin-right: 0.25em;
+            vertical-align: -0.4em;
+        }
+
+        blockquote p {
+            display: inline;
+        }
+
+        textarea:focus {
+            outline: 2px solid var(--primarycolor);
+            box-shadow: 2px 0 10px 0px var(--primarycolor);
+        }
+
+        .title {
+            background-color: var(--secondarycolor);
+            color: #fff;
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+
+        code {
+            background-color: var(--primarycolor);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            margin: 0;
+            border-radius: 0;
+        }
+
+        pre {
+            background-color: var(--primarycolor);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+            transition: color 0.3s ease;
+
+        }
+
+
+        a:hover {
+            color: #0056b3;
+        }
+
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 0 auto;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+
+        }
+
+
+        .scrollbar::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        body::-webkit-scrollbar-track,
+        .scrollbar::-webkit-scrollbar-track {
+            background-color: #e4e4e4;
+            border-radius: 100px;
+        }
+
+        body::-webkit-scrollbar-thumb,
+        .scrollbar::-webkit-scrollbar-thumb {
+            background-color: var(--primarycolor);
+            border-radius: 100px;
+        }
+
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            outline: 2px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+        }
+
+
+        th {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+        }
+
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+
+        tbody tr:last-child td {
+            border-bottom: none;
+
+        }
+
+
+        tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+
+        tbody tr:nth-child(even) {
+            background-color: #fff;
+        }
+
+
+        hr {
+            border: none;
+            height: 2px;
+            background-color: var(--primarycolor);
+            margin: 20px 0;
+            border-radius: 5px;
+
+        }
+
+        button {
+            background-color: white;
+            color: var(--secondarycolor);
+            border: 2px solid var(--secondarycolor);
+            font-family: inherit;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, border 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+
+        button:hover {
+            color: white;
+            background-color: var(--secondarycolor);
+            border: 2px solid var(--primarycolor);
+        }
+
+        select {
+            background-color: white;
+            color: var(--secondarycolor);
+            border: 2px solid var(--secondarycolor);
+            font-family: inherit;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, border 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+
+        select:hover,
+        select:focus {
+            color: white;
+            background-color: var(--secondarycolor);
+            border: 2px solid var(--primarycolor);
+        }
+
+
+
+        i {
+            margin-right: 0.5rem;
+        }
+
+        #markdown-content {
+            padding: 2rem;
+            border: 2px solid var(--secondarycolor);
+            border-radius: 0.5rem;
+            box-shadow: 0px 0px 8px 0px var(--secondarycolor);
+        }
+
+        #markdown-content h1,
+        #markdown-content h2,
+        #markdown-content h3 {
+            margin: 0;
+        }
+
+        /* Estilo para los elementos de lista */
+        ul#file-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul#file-list li {
+            margin-bottom: 10px;
+        }
+
+        ul#file-list li a {
+            display: inline-block;
+            background-color: var(--primarycolor);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        ul#file-list li a:hover {
+            background-color: var(--secondarycolor);
+        }
+
+
+        /* Estilo para el menú de clic derecho personalizado */
+        .custom-context-menu {
+            position: absolute;
+            background-color: var(--secondarycolor);
+            /* Utiliza la variable de color primario */
+            border: 1px solid var(--secondarycolor);
+            /* Utiliza la variable de color secundario para el borde */
+            border-radius: 0.5rem;
+            /* Añade bordes redondeados */
+            padding: 0.5rem;
+            z-index: 1000;
+            display: none;
+        }
+
+        .custom-context-menu button {
+            display: block;
+            width: 100%;
+            padding: 0.5rem;
+            text-align: left;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            color: white;
+            /* Utiliza el color secundario para el texto de los botones */
+        }
+
+        .custom-context-menu button:hover {
+            background-color: white;
+            /* Utiliza el color secundario cuando se pasa el mouse sobre un botón */
+            color: var(--secondarycolor);
+            /* Cambia el color del texto al pasar el mouse para que sea más legible */
+        }
+        .menu {
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: row;
+            background-color: white;
+            z-index: 1;
+            padding: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            box-shadow: 0px 0 1rem 0rem var(--secondarycolor);
+            border: 2px solid var(--secondarycolor);
+            margin-bottom: 0.5rem;
+        }

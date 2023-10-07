@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>Lista de Archivos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+    integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .file-list {
+      flex: 1;
+      max-height: 75vh;
+      overflow-y: scroll;
+      z-index: 1;
+    }
+
+    .file-viewer {
+      flex: 2;
+      max-height: 480px;
+      border-left: 1px solid #ccc;
+    }
+
+    h1 {
+      background-color: #333;
+      color: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      font-size: 2rem;
+      margin: 0;
+      margin-bottom: 1rem;
+    }
+
+    #actualPath {
+      margin: 0;
+      padding: 0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    li {
+      margin: 5px;
+      background-color: #eee;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 200px;
+      word-wrap: break-word;
+      cursor: pointer;
+    }
+
+    li.active {
+      transform: translateY(-5px);
+      box-shadow: 0px 10px 6px 0px #7a86f0 !important;
+    }
+
+    li:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 10px 6px 0px #ff8d8d;
+    }
+
+    body::-webkit-scrollbar,
+    .file-list::-webkit-scrollbar {
+      width: 6px;
+      /* Ancho de la barra de desplazamiento */
+    }
+
+    body::-webkit-scrollbar-thumb,
+    .file-list::-webkit-scrollbar-thumb {
+      background-color: #888;
+      /* Color del pulgar de la barra de desplazamiento */
+      border-radius: 3px;
+      /* Borde redondeado del pulgar */
+    }
+
+    /* Estilos para el riel de fondo de la barra de desplazamiento */
+    body::-webkit-scrollbar-track,
+    .file-list::-webkit-scrollbar-track {
+      background-color: #f0f0f0;
+      /* Color del riel de fondo */
+    }
+
+    a {
+      text-decoration: none;
+      color: black;
+      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      padding: 0.3rem;
+      margin-top: auto;
+      z-index: 1;
+      position: relative;
+      word-wrap: break-word;
+      width: 80%;
+    }
+
+    .preview-container {
+      position: relative;
+      width: 200px;
+      padding-top: 56.25%;
+      background: #000;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      z-index: 0;
+      cursor: pointer;
+    }
+
+    .preview-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+    }
+
+    .preview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #downloadButton {
+      background-color: #7a86f0;
+      padding: 0.5rem;
+      width: fit-content;
+      color: white;
+      box-shadow: 0rem 0.4rem 0.5rem 0.1rem #7a86f0;
+      transition: background-color 0.2s ease-in-out,
+        transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    #downloadButton:hover {
+      background-color: #ff8d8d;
+      transform: translateY(-5px);
+      box-shadow: 0rem 0.4rem 1rem 0.4rem #ff8d8d;
+    }
+
+    .pathButton {
+      background-color: #7a86f0;
+      padding: 0.5rem;
+      width: fit-content;
+      color: white;
+      box-shadow: 0rem 0.4rem 0.5rem 0.1rem #7a86f0;
+      transition: background-color 0.2s ease-in-out,
+        transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      outline: none;
+      border: none;
+      border-radius: 0.5rem;
+      font-family: inherit;
+      font-weight: bold;
+      margin-right: 0.5rem;
+      cursor: pointer;
+      align-items: center;
+      display: flex;
+    }
+
+    .pathButton:hover {
+      background-color: #ff8d8d;
+      transform: translateY(-5px);
+      box-shadow: 0rem 0.4rem 1rem 0.4rem #ff8d8d;
+    }
+
+    i {
+      margin-right: 0.5rem;
+    }
+
+    iframe {
+      width: 100%;
+      height: 70vh;
+      border: none;
+    }
+
+    #container {
+      display: flex;
+      flex-direction: row;
+    }
+
+    /* Estilos para la barra de filtros */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      position: sticky;
+      top: 0;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      padding-bottom: 1rem;
+      word-break: normal;
+      z-index: 2;
+      border-bottom-left-radius: 1rem;
+      border-bottom-right-radius: 1rem;
+      background: white;
+      box-shadow: 0px 10px 20px 0px rgba(177, 177, 177, 0.729);
+    }
+
+    /* Estilo para el cuadro de búsqueda */
+    #searchInput {
+      padding: 0.5rem;
+      border: 2px solid #ccc;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      flex-grow: 1;
+      outline: none;
+      font-family: inherit;
+      text-align: center;
+      width: 50%;
+      transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out,
+        width 0.2s ease-in-out;
+    }
+
+    #searchInput::placeholder {
+      opacity: 1;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    /* Cambiar el tamaño de fuente del placeholder en el estado :focus */
+    #searchInput:focus::placeholder {
+      opacity: 0.5;
+    }
+
+    #searchInput:focus {
+      width: 70%;
+      box-shadow: 0px 10px 15px -8px #ff8d8d !important;
+      border: 2px solid #ff8d8d !important;
+    }
+
+    #searchInput:hover {
+      box-shadow: 0px 10px 15px -8px #7a86f0;
+      border: 2px solid #7a86f0;
+    }
+
+    /* Estilos para las etiquetas de casillas de verificación */
+    label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: #333;
+      font-weight: bold;
+      user-select: none;
+      transition: box-shadow 0.2s ease-in-out, color 0.2s ease-in-out;
+      margin-right: 0.5rem;
+    }
+
+    label:hover {
+      box-shadow: 0px 10px 15px -8px #7a86f0;
+      color: #7a86f0;
+    }
+
+    label.active {
+      box-shadow: 0px 10px 15px -8px #ff8d8d;
+      color: #ff8d8d;
+    }
+
+    /* Estilo para las casillas de verificación */
+    input[type="checkbox"] {
+      margin-right: 5px;
+      cursor: pointer;
+      accent-color: #ff8d8d;
+    }
+
+    /* Estilos de hover y focus para las casillas de verificación */
+    input[type="checkbox"]:hover,
+    input[type="checkbox"]:focus {
+      outline: none;
+    }
+
+    @media (max-width: 1250px) {
+      #container {
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: 3rem;
+      }
+
+      a {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1 style="align-items: center;justify-content: center;display: flex;flex-direction: column;">
+    <div style="display: flex;flex-direction: row;align-items: center;"><i class="fa fa-folder" aria-hidden="true"></i>Explorador de Archivos</div>
+    <span id="actualPath" style="margin-top: 1rem;display: flex;flex-direction: row;"></span>
+  </h1>
+  <div id="container">
+    <div class="file-list">
+      <div class="filter-bar" style="display: flex; flex-direction: column">
+        <input type="text" id="searchInput" placeholder="Buscar..." />
+        <div style="display: flex; flex-direction: column; align-items: center">
+          <!-- Grupo 1 - Tres elementos arriba -->
+          <div style="display: flex; flex-direction: row">
+            <label for="videoFilter">
+              <input type="checkbox" id="videoFilter" /> Video
+            </label>
+            <label for="imageFilter">
+              <input type="checkbox" id="imageFilter" /> Imagen
+            </label>
+            <label for="markdownFilter">
+              <input type="checkbox" id="markdownFilter" /> Markdown
+            </label>
+          </div>
+
+          <!-- Grupo 2 - Dos elementos abajo -->
+          <div style="display: flex; flex-direction: row">
+            <label for="audioFilter">
+              <input type="checkbox" id="audioFilter" /> Audio
+            </label>
+            <label for="folderFilter">
+              <input type="checkbox" id="folderFilter" /> Carpeta
+            </label>
+          </div>
+        </div>
+      </div>
+      <ul id="fileList"></ul>
+    </div>
+    <div class="file-viewer">
+      <p style="font-size: 1.5rem;margin-left: 1rem;display: none;" id="fileText"><span
+          style="font-weight: bold">Archivo:</span> <span id="selectedLinkText"></span></p>
+      <iframe name="fileViewer" id="fileViewer" frameborder="0"></iframe>
+      <a id="downloadButton" download style="display: none">
+        <i class="fas fa-download"></i> Descargar
+      </a>
+    </div>
+  </div>
+  <script>
+    let activeListItem = null;
+    let actualPath = "";
+    function updateActualPathSpan() {
+      const actualPathSpan = document.querySelector("#actualPath");
+
+      if (actualPathSpan) {
+        const displayedPath = "INICIO" + (actualPath ? "/" + actualPath : "");
+        actualPathSpan.innerHTML = ""; // Limpia el contenido anterior
+
+        // Divide la ruta en partes separadas por "/"
+        const pathParts = displayedPath.split("/");
+
+        // Itera sobre las partes de la ruta
+        pathParts.forEach((part, index) => {
+  // Crea un elemento <button> para cada parte
+  const button = document.createElement("button");
+  button.classList.add("pathButton");
+  button.textContent = part;
+
+  // Agrega un evento de clic personalizado a cada botón
+  if (index === 0) {
+    // Para la primera parte, llamar a fetchAndDisplayFiles()
+    button.addEventListener("click", () => {
+      fetchAndDisplayFiles();
+      actualPath = "";
+      updateActualPathSpan();
+    });
+  } else {
+    // Para las partes siguientes, llamar a changeFolder() con la ruta adecuada
+    button.addEventListener("click", () => {
+      const clickedPath = pathParts.slice(1, index + 1).join("/");
+      actualPath = clickedPath;
+      switchFolder(clickedPath);
+      console.log(clickedPath);
+    });
+  }
+
+  // Agrega el botón al span
+  actualPathSpan.appendChild(button);
+
+  // Agrega un espacio después de cada botón, excepto el último
+  if (index < pathParts.length - 1) {
+    actualPathSpan.appendChild(document.createTextNode(" "));
+  }
+
+  // Agrega un icono de Font Awesome después de cada botón, excepto el último
+  if (index < pathParts.length - 1) {
+    const icon = document.createElement("i");
+    icon.classList.add("fas", "fa-chevron-right"); // Cambia "fa-chevron-right" por el icono que desees
+    actualPathSpan.appendChild(icon);
+  }
+});
+      }
+    }
+    async function fetchAndDisplayFiles() {
+      try {
+        const response = await fetch("/files");
+        if (!response.ok) {
+          throw new Error("No se pudo obtener la lista de archivos");
+        }
+        const data = await response.json();
+        const fileList = data.mediaFiles;
+        const folderList = data.mediaFolders;
+        const ul = document.getElementById("fileList");
+
+        ul.innerHTML = "";
+        // Listar carpetas
+        folderList.forEach((folderName) => {
+          const li = document.createElement("li");
+          const folderType = "dir"; // Tipo de carpeta
+          const folderPreview = "default_folder.jpg"; // Vista previa de la carpeta
+
+          li.setAttribute("type", folderType);
+
+          // Agregar función onclick para cambiar de carpeta
+          li.onclick = function () {
+            changeFolder(folderName);
+          };
+
+          // Crear elementos para la carpeta
+          const folderLink = document.createElement("a");
+          folderLink.innerHTML = `${folderName}`;
+          const folderPreviewContainer = document.createElement("div");
+          folderPreviewContainer.className = "preview-container";
+          const folderPreviewImg = document.createElement("img");
+          folderPreviewImg.className = "preview";
+          folderPreviewImg.src = `/default-images/${folderPreview}`;
+          folderPreviewImg.alt = "Carpeta";
+
+          // Agregar elementos al elemento de lista
+          folderPreviewContainer.appendChild(folderPreviewImg);
+          li.appendChild(folderLink);
+          li.appendChild(folderPreviewContainer);
+          ul.appendChild(li);
+        });
+
+        fileList.forEach((fileName) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          const fileExtension = fileName.split(".").pop(); // Obtener la extensión del archivo
+
+          // Definir el objeto de mapeo de extensiones a tipos
+          const extensionToType = {
+            md: "markdown",
+            MD: "markdown",
+            mp4: "video",
+            MP4: "video",
+            mov: "video",
+            MOV: "video",
+            mp3: "audio",
+            MP3: "audio",
+            ogg: "audio",
+            OGG: "audio",
+            wav: "audio",
+            WAV: "audio",
+            jpg: "imagen",
+            JPG: "imagen",
+            jpeg: "imagen",
+            JPEG: "imagen",
+            png: "imagen",
+            PNG: "imagen",
+          };
+
+          // Verificar la extensión del archivo y ajustar el enlace y el tipo en consecuencia
+          if (extensionToType[fileExtension]) {
+            a.href = `/static/${extensionToType[fileExtension]
+              }.html?name=${encodeURIComponent(fileName)}`;
+            li.setAttribute("type", extensionToType[fileExtension]); // Agregar el atributo "type"
+          } else {
+            a.href = `/${actualPath}/${encodeURIComponent(fileName)}`;
+            li.setAttribute("type", "other"); // Si no se encuentra la extensión, establecer como "other"
+          }
+
+          a.textContent = fileName;
+
+          // Crear elemento de vista previa y contenedor
+          const previewContainer = document.createElement("div");
+          previewContainer.className = "preview-container";
+          const previewBg = document.createElement("img");
+          previewBg.className = "preview-bg";
+          previewBg.src = `/preview/${encodeURIComponent(fileName)}/${actualPath}`; // Ruta de la vista previa
+          previewBg.alt = "Vista previa";
+          const preview = document.createElement("img");
+          preview.className = "preview";
+          preview.src = `/preview/${encodeURIComponent(fileName)}/${actualPath}`; // Ruta de la vista previa
+          preview.alt = "Vista previa";
+
+          // Agregar elementos al elemento de lista
+          previewContainer.appendChild(previewBg);
+          previewContainer.appendChild(preview);
+          li.appendChild(a);
+          li.appendChild(previewContainer);
+          ul.appendChild(li);
+
+          // Agregar eventos de "hover" y "clic" al elemento de lista
+          li.addEventListener("mouseenter", function () {
+            const hoverEvent = new MouseEvent("mouseenter", {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+          });
+          li.addEventListener("click", function (event) {
+            const downloadButton = document.getElementById("downloadButton");
+            const selectedLinkText = document.getElementById("selectedLinkText"); // Elemento donde se muestra el texto del enlace seleccionado
+            const pContainer = document.getElementById("fileText");
+            pContainer.style.display = 'block';
+            downloadButton.style.display = "block";
+            // Prevenir la acción predeterminada del enlace
+            event.preventDefault();
+
+            // Cambiar la URL del iframe #fileViewer
+            document.getElementById("fileViewer").src = a.href;
+            // Establecer el valor del atributo href en el botón de descarga
+            downloadButton.setAttribute("href", `/${actualPath}/${fileName}`);
+
+            // Actualizar el contenido del elemento con el texto del enlace seleccionado
+            selectedLinkText.textContent = a.textContent;
+
+            // Si ya hay un elemento activo, quita la clase "active" de ese elemento
+            if (activeListItem) {
+              activeListItem.classList.remove("active");
+            }
+
+            // Establece el nuevo elemento como activo y agrega la clase "active"
+            activeListItem = li;
+            li.classList.add("active");
+            updateActualPathSpan();
+          });
+
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // Llamar a la función para obtener y mostrar la lista de archivos
+    fetchAndDisplayFiles();
+    updateActualPathSpan();
+
+    $(document).ready(function () {
+      // Capturar el evento de cambio en las casillas de verificación
+      $('input[type="checkbox"]').on("change", function () {
+        const label = $('label[for="' + $(this).attr("id") + '"]');
+
+        if ($(this).prop("checked")) {
+          // Si la casilla de verificación está marcada, agregar la clase 'active' al label
+          label.addClass("active");
+        } else {
+          // Si la casilla de verificación está desmarcada, quitar la clase 'active' del label
+          label.removeClass("active");
+        }
+
+        // Llamar a la función filterFiles() u otra acción que desees realizar
+        filterFiles();
+      });
+
+      // Capturar el evento de entrada en el cuadro de búsqueda
+      $('.file-list input[type="text"]').on("input", function () {
+        // Llamar a la función de filtrado cuando se escriba en el cuadro de búsqueda
+        filterFiles();
+      });
+
+      function filterFiles() {
+        const searchText = $("#searchInput").val().toLowerCase();
+        const videoFilter = $("#videoFilter").prop("checked");
+        const imageFilter = $("#imageFilter").prop("checked");
+        const markdownFilter = $("#markdownFilter").prop("checked");
+        const audioFilter = $("#audioFilter").prop("checked");
+        const folderFilter = $("#folderFilter").prop("checked");
+
+        $(".file-list ul li").each(function () {
+          const fileType = $(this).attr("type").toLowerCase();
+          const fileName = $(this).find("a").text().toLowerCase();
+
+          const isSearchMatch =
+            searchText === "" || fileName.includes(searchText);
+
+          // Verificar si al menos un filtro está seleccionado o si no se selecciona ninguno
+          const isFilterSelected =
+            videoFilter ||
+            imageFilter ||
+            markdownFilter ||
+            audioFilter ||
+            folderFilter;
+
+          // Mostrar el elemento si no se ha seleccionado ningún filtro o si cumple con los filtros seleccionados
+          const isVisible =
+            !isFilterSelected ||
+            (videoFilter && fileType === "video") ||
+            (imageFilter && fileType === "imagen") ||
+            (markdownFilter && fileType === "markdown") ||
+            (audioFilter && fileType === "audio") ||
+            (folderFilter && fileType === "dir");
+
+          if (isVisible && isSearchMatch) {
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+      }
+    });
+
+    async function changeFolder(folderName) {
+      if (actualPath !== "") {
+        // Agregar una barra antes del nombre de la nueva carpeta
+        actualPath = actualPath + "/";
+      }
+      // Agregar el nombre de la nueva carpeta
+      actualPath = actualPath + folderName;
+      console.log(actualPath)
+      updateActualPathSpan();
+      try {
+        const response = await fetch(
+          `/dir/${encodeURIComponent(actualPath)}`
+        );
+        if (!response.ok) {
+          throw new Error(
+            "No se pudo obtener la lista de archivos y carpetas"
+          );
+        }
+        const data = await response.json();
+        const fileList = data.mediaFiles;
+        const folderList = data.mediaFolders;
+
+        // Limpiar la lista existente
+        const ul = document.getElementById("fileList");
+        while (ul.firstChild) {
+          ul.removeChild(ul.firstChild);
+        }
+        // Listar carpetas
+        folderList.forEach((folderName) => {
+          const li = document.createElement("li");
+          const folderType = "dir"; // Tipo de carpeta
+          const folderPreview = "default_folder.jpg"; // Vista previa de la carpeta
+
+          li.setAttribute("type", folderType);
+
+          // Agregar función onclick para cambiar de carpeta
+          li.onclick = function () {
+            changeFolder(folderName);
+          };
+
+          // Crear elementos para la carpeta
+          const folderLink = document.createElement("a");
+          folderLink.textContent = folderName;
+          const folderPreviewContainer = document.createElement("div");
+          folderPreviewContainer.className = "preview-container";
+          const folderPreviewImg = document.createElement("img");
+          folderPreviewImg.className = "preview";
+          folderPreviewImg.src = `/default-images/${folderPreview}`;
+          folderPreviewImg.alt = "Carpeta";
+
+          // Agregar elementos al elemento de lista
+          folderPreviewContainer.appendChild(folderPreviewImg);
+          li.appendChild(folderLink);
+          li.appendChild(folderPreviewContainer);
+          ul.appendChild(li);
+        });
+
+        // Mostrar los archivos en la lista
+        fileList.forEach((fileName) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          const fileExtension = fileName.split(".").pop(); // Obtener la extensión del archivo
+
+          const extensionToType = {
+            md: "markdown",
+            MD: "markdown",
+            mp4: "video",
+            MP4: "video",
+            mov: "video",
+            MOV: "video",
+            mp3: "audio",
+            MP3: "audio",
+            ogg: "audio",
+            OGG: "audio",
+            wav: "audio",
+            WAV: "audio",
+            jpg: "imagen",
+            JPG: "imagen",
+            jpeg: "imagen",
+            JPEG: "imagen",
+            png: "imagen",
+            PNG: "imagen",
+          };
+
+
+          // Verificar la extensión del archivo y ajustar el enlace y el tipo en consecuencia
+          if (extensionToType[fileExtension]) {
+            a.href = `/static/${extensionToType[fileExtension]
+              }.html?name=${encodeURIComponent(
+                fileName
+              )}&folder=${actualPath}`;
+            li.setAttribute("type", extensionToType[fileExtension]); // Agregar el atributo "type"
+          } else {
+            a.href = `/${actualPath}/${encodeURIComponent(fileName)}`;
+            li.setAttribute("type", "other"); // Si no se encuentra la extensión, establecer como "other"
+          }
+
+          a.textContent = fileName;
+
+          // Crear elemento de vista previa y contenedor
+          const previewContainer = document.createElement("div");
+          previewContainer.className = "preview-container";
+          const previewBg = document.createElement("img");
+          previewBg.className = "preview-bg";
+          previewBg.src = `/preview/${encodeURIComponent(
+            fileName
+          )}/${actualPath}`; // Ruta de la vista previa
+          previewBg.alt = "Vista previa";
+          const preview = document.createElement("img");
+          preview.className = "preview";
+          preview.src = `/preview/${encodeURIComponent(
+            fileName
+          )}/${actualPath}`; // Ruta de la vista previa
+          preview.alt = "Vista previa";
+
+          // Agregar elementos al elemento de lista
+          previewContainer.appendChild(previewBg);
+          previewContainer.appendChild(preview);
+          li.appendChild(a);
+          li.appendChild(previewContainer);
+          ul.appendChild(li);
+
+          // Agregar eventos de "hover" y "clic" al elemento de lista
+          li.addEventListener("mouseenter", function () {
+            const hoverEvent = new MouseEvent("mouseenter", {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+          });
+
+          li.addEventListener("click", function (event) {
+            const downloadButton = document.getElementById("downloadButton");
+            const selectedLinkText = document.getElementById("selectedLinkText"); // Elemento donde se muestra el texto del enlace seleccionado
+            const pContainer = document.getElementById("fileText");
+            pContainer.style.display = 'block';
+            downloadButton.style.display = "block";
+            // Prevenir la acción predeterminada del enlace
+            event.preventDefault();
+
+            // Cambiar la URL del iframe #fileViewer
+            document.getElementById("fileViewer").src = a.href;
+            // Establecer el valor del atributo href en el botón de descarga
+            downloadButton.setAttribute("href", `/${actualPath}/${fileName}`);
+
+            // Actualizar el contenido del elemento con el texto del enlace seleccionado
+            selectedLinkText.textContent = a.textContent;
+
+            // Si ya hay un elemento activo, quita la clase "active" de ese elemento
+            if (activeListItem) {
+              activeListItem.classList.remove("active");
+            }
+
+            // Establece el nuevo elemento como activo y agrega la clase "active"
+            activeListItem = li;
+            li.classList.add("active");
+            updateActualPathSpan();
+          });
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    async function switchFolder(folderName) {
+      actualPath = folderName;
+      updateActualPathSpan();
+      try {
+        const response = await fetch(
+          `/dir/${encodeURIComponent(actualPath)}`
+        );
+        if (!response.ok) {
+          throw new Error(
+            "No se pudo obtener la lista de archivos y carpetas"
+          );
+        }
+        const data = await response.json();
+        const fileList = data.mediaFiles;
+        const folderList = data.mediaFolders;
+
+        // Limpiar la lista existente
+        const ul = document.getElementById("fileList");
+        while (ul.firstChild) {
+          ul.removeChild(ul.firstChild);
+        }
+        // Listar carpetas
+        folderList.forEach((folderName) => {
+          const li = document.createElement("li");
+          const folderType = "dir"; // Tipo de carpeta
+          const folderPreview = "default_folder.jpg"; // Vista previa de la carpeta
+
+          li.setAttribute("type", folderType);
+
+          // Agregar función onclick para cambiar de carpeta
+          li.onclick = function () {
+            changeFolder(folderName);
+          };
+
+          // Crear elementos para la carpeta
+          const folderLink = document.createElement("a");
+          folderLink.textContent = folderName;
+          const folderPreviewContainer = document.createElement("div");
+          folderPreviewContainer.className = "preview-container";
+          const folderPreviewImg = document.createElement("img");
+          folderPreviewImg.className = "preview";
+          folderPreviewImg.src = `/default-images/${folderPreview}`;
+          folderPreviewImg.alt = "Carpeta";
+
+          // Agregar elementos al elemento de lista
+          folderPreviewContainer.appendChild(folderPreviewImg);
+          li.appendChild(folderLink);
+          li.appendChild(folderPreviewContainer);
+          ul.appendChild(li);
+        });
+
+        // Mostrar los archivos en la lista
+        fileList.forEach((fileName) => {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          const fileExtension = fileName.split(".").pop(); // Obtener la extensión del archivo
+
+          // Definir el objeto de mapeo de extensiones a tipos
+          const extensionToType = {
+              md: "markdown",
+              MD: "markdown",
+              mp4: "video",
+              MP4: "video",
+              mov: "video",
+              MOV: "video",
+              mp3: "audio",
+              MP3: "audio",
+              ogg: "audio",
+              OGG: "audio",
+              wav: "audio",
+              WAV: "audio",
+              jpg: "imagen",
+              JPG: "imagen",
+              jpeg: "imagen",
+              JPEG: "imagen",
+              png: "imagen",
+              PNG: "imagen",
+            };
+          // Verificar la extensión del archivo y ajustar el enlace y el tipo en consecuencia
+          if (extensionToType[fileExtension]) {
+            a.href = `/static/${extensionToType[fileExtension]
+              }.html?name=${encodeURIComponent(
+                fileName
+              )}&folder=${encodeURIComponent(actualPath)}`;
+            li.setAttribute("type", extensionToType[fileExtension]); // Agregar el atributo "type"
+          } else {
+            a.href = `/${actualPath}/${encodeURIComponent(fileName)}`;
+            li.setAttribute("type", "other"); // Si no se encuentra la extensión, establecer como "other"
+          }
+
+          a.textContent = fileName;
+
+          // Crear elemento de vista previa y contenedor
+          const previewContainer = document.createElement("div");
+          previewContainer.className = "preview-container";
+          const previewBg = document.createElement("img");
+          previewBg.className = "preview-bg";
+          previewBg.src = `/preview/${encodeURIComponent(
+            fileName
+          )}/${actualPath}`; // Ruta de la vista previa
+          previewBg.alt = "Vista previa";
+          const preview = document.createElement("img");
+          preview.className = "preview";
+          preview.src = `/preview/${encodeURIComponent(
+            fileName
+          )}/${actualPath}`; // Ruta de la vista previa
+          preview.alt = "Vista previa";
+
+          // Agregar elementos al elemento de lista
+          previewContainer.appendChild(previewBg);
+          previewContainer.appendChild(preview);
+          li.appendChild(a);
+          li.appendChild(previewContainer);
+          ul.appendChild(li);
+
+          // Agregar eventos de "hover" y "clic" al elemento de lista
+          li.addEventListener("mouseenter", function () {
+            const hoverEvent = new MouseEvent("mouseenter", {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+          });
+
+          li.addEventListener("click", function (event) {
+            const downloadButton = document.getElementById("downloadButton");
+            const selectedLinkText = document.getElementById("selectedLinkText"); // Elemento donde se muestra el texto del enlace seleccionado
+            const pContainer = document.getElementById("fileText");
+            pContainer.style.display = 'block';
+            downloadButton.style.display = "block";
+            // Prevenir la acción predeterminada del enlace
+            event.preventDefault();
+
+            // Cambiar la URL del iframe #fileViewer
+            document.getElementById("fileViewer").src = a.href;
+            // Establecer el valor del atributo href en el botón de descarga
+            downloadButton.setAttribute("href", `/${actualPath}/${fileName}`);
+
+            // Actualizar el contenido del elemento con el texto del enlace seleccionado
+            selectedLinkText.textContent = a.textContent;
+
+            // Si ya hay un elemento activo, quita la clase "active" de ese elemento
+            if (activeListItem) {
+              activeListItem.classList.remove("active");
+            }
+
+            // Establece el nuevo elemento como activo y agrega la clase "active"
+            activeListItem = li;
+            li.classList.add("active");
+            updateActualPathSpan();
+          });
+        });
+
+        folderList.forEach((folderName) => {
+          const folderLi = document.createElement("li");
+          const folderA = document.createElement("a");
+          folderA.href = `/dir/${encodeURIComponent(folderName)}`;
+          folderA.textContent = folderName;
+          folderLi.appendChild(folderA);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    // Función para obtener el valor de un query param dado su nombre
+    function getQueryParam(paramName) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(paramName);
+    }
+
+    // Verificar si existe el query param "folder" en la URL
+    window.addEventListener("DOMContentLoaded", function () {
+      const folderParam = getQueryParam("folder");
+      if (folderParam) {
+        // Si existe el parámetro "folder", llama a switchFolder con su valor
+        switchFolder(folderParam);
+      }
+    });
+  </script>
+</body>
+
+</html>

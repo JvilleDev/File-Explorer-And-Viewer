@@ -1,0 +1,20 @@
+{
+  "name": "file_explorer",
+  "version": "1.0.0",
+  "description": "A little more beautiful than the first i upload",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app"
+  },
+  "dependencies": {
+    "express": "*",
+    "fs": "*",
+    "path": "*",
+    "fluent-ffmpeg": "*",
+    "canvas": "*"
+  },
+  "keywords": [],
+  "author": "JvilleDev",
+  "license": "ISC"
+}

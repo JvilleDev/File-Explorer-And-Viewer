@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css">
+    <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
+    <title>Ver Video</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <style>
+        /* Estilo personalizado para el reproductor de video */
+        .plyr {
+            width: 100%;
+            height: 96vh;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <video id="videoPlayer" controls autoplay>
+        Tu navegador no admite la reproducción de video.
+    </video>
+
+    <script>
+        // Obtener el valor del parámetro "name" de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoName = urlParams.get("name");
+        const folderName = urlParams.get("folder"); // Obtener el valor del parámetro "folder"
+
+        // Obtener el elemento de video y configurar el reproductor Plyr
+        const videoPlayer = new Plyr('#videoPlayer', {
+            controls: ['play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+            autoplay: true
+        });
+
+        if (videoName) {
+            // Construir la ruta del video basada en la presencia del parámetro "folder"
+            let videoSrc;
+            if (folderName) {
+                videoSrc = `/${folderName}/${videoName}`;
+            } else {
+                videoSrc = `/${videoName}`;
+            }
+
+            videoPlayer.source = {
+                type: 'video',
+                sources: [
+                    {
+                        src: videoSrc,
+                        type: 'video/mp4',
+                    },
+                ],
+            };
+        }
+    </script>
+</body>
+</html>

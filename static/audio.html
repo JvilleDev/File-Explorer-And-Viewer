@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.8/plyr.css">
+    <script src="https://cdn.plyr.io/3.6.8/plyr.js"></script>
+    <title>Reproductor de Audio Elegante</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+    <style>
+        /* Estilo personalizado para el reproductor de audio */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .plyr {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h2 id="audioFileName">Nombre del Archivo</h2>
+    <audio id="audioPlayer" class="plyr" controls autoplay>
+        Tu navegador no admite la reproducción de audio.
+    </audio>
+
+    <script>
+// Obtener el valor del parámetro "name" de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const audioName = urlParams.get("name");
+const folderName = urlParams.get("folder"); // Obtener el valor del parámetro "folder"
+
+// Obtener el elemento de audio y configurar el reproductor Plyr
+const audioPlayer = new Plyr('#audioPlayer', {
+    controls: ['play', 'progress', 'current-time', 'mute', 'volume'],
+    autoplay: true
+});
+
+if (audioName) {
+    // Construir la ruta del archivo de audio basada en la presencia del parámetro "folder"
+    let audioSrc;
+    if (folderName) {
+        audioSrc = `/${folderName}/${audioName}`;
+    } else {
+        audioSrc = `/${audioName}`;
+    }
+
+    audioPlayer.source = {
+        type: 'audio',
+        sources: [
+            {
+                src: audioSrc,
+                type: 'audio/mp3', // Puedes ajustar el tipo de archivo de audio
+            },
+        ],
+    };
+
+    // Establecer el nombre del archivo en el elemento HTML
+    const audioFileNameElement = document.getElementById('audioFileName');
+    audioFileNameElement.textContent = audioName;
+}
+    </script>
+</body>
+</html>

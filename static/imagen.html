@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Imagen</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        #image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #333;
+        }
+
+        #image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <div id="image-container">
+        <img id="image" src="" alt="Imagen">
+    </div>
+
+    <script>
+// Obtener el valor del parámetro "name" de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const imageName = urlParams.get("name");
+const folderName = urlParams.get("folder"); // Obtener el valor del parámetro "folder"
+
+if (imageName) {
+    // Construir la ruta de la imagen basada en la presencia del parámetro "folder"
+    let imageUrl;
+    if (folderName) {
+        imageUrl = `/${folderName}/${imageName}`;
+    } else {
+        imageUrl = `/${imageName}`;
+    }
+
+    // Obtener el elemento de imagen y establecer la fuente
+    const imageElement = document.getElementById("image");
+    imageElement.src = imageUrl;
+}
+    </script>
+</body>
+</html>
