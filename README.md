@@ -59,3 +59,7 @@ Server started on: http://localhost:3000
 ---
 
 ### NOTE: This project is mainly oriented to multimedia content, but it is also capable of displaying: PDF's, TXT, JSON, MD, etc.
+---
+
+# Captura de pantalla / Screenshot:
+![Imagen](https://raw.githubusercontent.com/JvilleDev/File-Explorer-And-Viewer/main/ScreenShot.png)
